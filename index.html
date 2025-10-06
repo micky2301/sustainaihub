@@ -30,6 +30,7 @@
         <tbody></tbody>
     </table>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script>
         const SHEET_ID = '1IY9wqKCD6xApgXu8Ki6GMBy_zqEi-PJpzk1CR7l-mlM';
         const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
@@ -39,16 +40,24 @@
                 const response = await fetch(CSV_URL);
                 if (!response.ok) throw new Error('Sheet not public? Check sharing settings.');
                 const csv = await response.text();
-                const rows = csv.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '')));
-                const headers = rows[0];
-                const data = rows.slice(1).filter(row => row[0]); // Skip empty rows
+                
+                // Parse CSV properly (handles commas in fields)
+                const parsed = Papa.parse(csv, {
+                    header: true,
+                    skipEmptyLines: true,
+                    dynamicTyping: false,
+                    trimHeaders: true
+                });
+                const data = parsed.data.filter(row => row.Name && row.Name.trim()); // Skip empties
 
-                // Populate filter
-                const categories = [...new Set(data.map(row => row[3]))].sort();
+                if (data.length === 0) throw new Error('No data found—check Sheet columns.');
+
+                // Populate filter with unique, trimmed categories
+                const categories = [...new Set(data.map(row => row.Category ? row.Category.trim() : '').filter(cat => cat))].sort();
                 const filter = document.getElementById('filter');
                 categories.forEach(cat => {
                     const option = document.createElement('option');
-                    option.value = cat;
+                    option.value = cat.toLowerCase(); // Lower for case-insensitive match
                     option.textContent = cat;
                     filter.appendChild(option);
                 });
@@ -58,11 +67,13 @@
                 data.forEach(row => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td><strong>${row[0]}</strong></td>
-                        <td>${row[1]}</td>
-                        <td><a href="${row[2]}" target="_blank">${row[2]}</a></td>
-                        <td>${row[3]}</td>
+                        <td><strong>${row.Name || ''}</strong></td>
+                        <td>${row.Description || ''}</td>
+                        <td><a href="${row.Website || '#'}" target="_blank">${row.Website || 'N/A'}</a></td>
+                        <td>${row.Category || ''}</td>
                     `;
+                    // Store category for filtering
+                    tr.dataset.category = (row.Category || '').toLowerCase().trim();
                     tbody.appendChild(tr);
                 });
 
@@ -70,15 +81,15 @@
                 document.getElementById('listings').style.display = 'table';
                 filterTable(); // Initial filter
             } catch (error) {
-                document.getElementById('loading').textContent = `Error: ${error.message}. Fix Sheet privacy?`;
+                document.getElementById('loading').textContent = `Error: ${error.message}. Fix Sheet privacy/columns?`;
             }
         }
 
         function filterTable() {
-            const filterValue = document.getElementById('filter').value;
+            const filterValue = document.getElementById('filter').value.toLowerCase();
             const rows = document.querySelectorAll('#listings tbody tr');
             rows.forEach(row => {
-                const cat = row.cells[3].textContent;
+                const cat = row.dataset.category || '';
                 row.style.display = filterValue === '' || cat === filterValue ? '' : 'none';
             });
         }
