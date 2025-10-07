@@ -5,23 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SustainAIHub - AI Tools for Sustainable Businesses</title>
     <meta name="description" content="Discover AI tools for sustainable businesses—irrigation optimization, waste sorting, emissions tracking. Submit yours!">
-<meta name="keywords" content="sustainable AI, green tech tools, eco AI directory, AI for environment">
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "ItemList",
-  "name": "SustainAIHub Tools",
-  "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Rainforest Connection", "url": "https://rfcx.org/" },
-    { "@type": "ListItem", "position": 2, "name": "Kilimo", "url": "https://kilimo.com/" }
-    // Add more for your 10 tools if time
-  ]
-}
-</script>
+    <meta name="keywords" content="sustainable AI, green tech tools, eco AI directory, AI for environment">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "SustainAIHub Tools",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Rainforest Connection", "url": "https://rfcx.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Kilimo", "url": "https://kilimo.com/" }
+      ]
+    }
+    </script>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f4; }
         h1 { color: #228B22; text-align: center; }
-        #filter { margin: 10px 0; padding: 10px; width: 200px; }
+        #filter, #search { margin: 10px 0; padding: 10px; width: 200px; border: 1px solid #ddd; border-radius: 5px; }
+        #search { width: 300px; }
         table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
         th { background: #228B22; color: white; }
@@ -35,20 +35,21 @@
     <h1>SustainAIHub: AI Tools & Services for Sustainable Businesses</h1>
     <p style="text-align: center;">Discover AI solutions for eco-impact. Filter by category:</p>
     <select id="filter" onchange="searchTable(); filterTable();">
-        <input type="text" id="search" placeholder="Search tools by name or description..." style="margin: 10px 0; padding: 10px; width: 300px; border: 1px solid #ddd; border-radius: 5px;" onkeyup="searchTable()">
         <option value="">All Categories</option>
         <!-- Options will populate from data -->
     </select>
+    <input type="text" id="search" placeholder="Search tools by name or description..." onkeyup="searchTable()">
     <div id="loading" class="loading">Loading listings...</div>
     <table id="listings" style="display: none;">
         <thead><tr><th>Name</th><th>Description</th><th>Website</th><th>Category</th></tr></thead>
         <tbody></tbody>
     </table>
-<div style="margin-top: 30px; text-align: center;">
-    <h2>Add Your Tool</h2>
-    <p>Know a sustainable AI solution? Submit it below—we'll review and feature it!</p>
-    <a href="https://forms.gle/9VbGWcJqUGckodBC6" target="_blank" style="background: #228B22; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Submit Now</a>
-</div>
+    <div style="margin-top: 30px; text-align: center;">
+        <h2>Add Your Tool</h2>
+        <p>Know a sustainable AI solution? Submit it below—we'll review and feature it!</p>
+        <a href="YOUR_FORM_LINK_HERE" target="_blank" style="background: #228B22; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Submit Now</a>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script>
         // Hardcoded data from your Sheet (updates on code push)
@@ -66,66 +67,58 @@
         ];
 
         function loadData() {
-            // Simulate async load
-            setTimeout(() => {
-                // Populate filter with unique, trimmed categories
-                const categories = [...new Set(data.map(row => row.Category ? row.Category.trim() : '').filter(cat => cat))].sort();
-                const filter = document.getElementById('filter');
-                categories.forEach(cat => {
-                    const option = document.createElement('option');
-                    option.value = cat.toLowerCase(); // Lower for case-insensitive match
-                    option.textContent = cat;
-                    filter.appendChild(option);
-                });
+            // Instant load—no delay
+            // Populate filter with unique, trimmed categories
+            const categories = [...new Set(data.map(row => row.Category ? row.Category.trim() : '').filter(cat => cat))].sort();
+            const filter = document.getElementById('filter');
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.toLowerCase();
+                option.textContent = cat;
+                filter.appendChild(option);
+            });
 
-                // Build table
-                const tbody = document.querySelector('#listings tbody');
-                data.forEach(row => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td><strong>${row.Name || ''}</strong></td>
-                        <td>${row.Description || ''}</td>
-                        <td><a href="${row.Website || '#'}" target="_blank">${row.Website || 'N/A'}</a></td>
-                        <td>${row.Category || ''}</td>
-                    `;
-                    // Store category for filtering
-                    tr.dataset.category = (row.Category || '').toLowerCase().trim();
-                    tbody.appendChild(tr);
-                });
+            // Build table
+            const tbody = document.querySelector('#listings tbody');
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${row.Name || ''}</strong></td>
+                    <td>${row.Description || ''}</td>
+                    <td><a href="${row.Website || '#'}" target="_blank">${row.Website || 'N/A'}</a></td>
+                    <td>${row.Category || ''}</td>
+                `;
+                tr.dataset.category = (row.Category || '').toLowerCase().trim();
+                tbody.appendChild(tr);
+            });
 
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('listings').style.display = 'table';
-                filterTable(); // Initial filter
-            }, 500); // Fake load delay
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('listings').style.display = 'table';
+            searchTable(); // Initial search (empty)
+            filterTable(); // Initial filter (all)
         }
 
-        function filterTable() {
-    const filterValue = document.getElementById('filter').value.toLowerCase();
-    const rows = document.querySelectorAll('#listings tbody tr');
-    rows.forEach(row => {
-        if (row.style.display !== 'none') {  // Only process if visible after search
-            const cat = row.dataset.category || '';
-            row.style.display = (filterValue === '' || cat === filterValue) ? '' : 'none';
-        }
-    });
-        }
-            function searchTable() {
-    const searchValue = document.getElementById('search').value.toLowerCase();
-    const rows = document.querySelectorAll('#listings tbody tr');
-    rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        const cat = row.dataset.category || '';
-        row.style.display = (text.includes(searchValue) || searchValue === '') ? '' : 'none';
-    });
-            }
-            const filterValue = document.getElementById('filter').value.toLowerCase();
+        function searchTable() {
+            const searchValue = document.getElementById('search').value.toLowerCase();
             const rows = document.querySelectorAll('#listings tbody tr');
             rows.forEach(row => {
-                const cat = row.dataset.category || '';
-                row.style.display = filterValue === '' || cat === filterValue ? '' : 'none';
+                const text = row.textContent.toLowerCase();
+                row.style.display = (text.includes(searchValue) || searchValue === '') ? '' : 'none';
             });
         }
 
+        function filterTable() {
+            const filterValue = document.getElementById('filter').value.toLowerCase();
+            const rows = document.querySelectorAll('#listings tbody tr');
+            rows.forEach(row => {
+                if (row.style.display !== 'none') {  // Only process visible after search
+                    const cat = row.dataset.category || '';
+                    row.style.display = (filterValue === '' || cat === filterValue) ? '' : 'none';
+                }
+            });
+        }
+
+        // Load on page ready
         loadData();
     </script>
 </body>
