@@ -34,7 +34,8 @@
 <body>
     <h1>SustainAIHub: AI Tools & Services for Sustainable Businesses</h1>
     <p style="text-align: center;">Discover AI solutions for eco-impact. Filter by category:</p>
-    <select id="filter" onchange="filterTable()">
+    <select id="filter" onchange="searchTable(); filterTable();">
+        <input type="text" id="search" placeholder="Search tools by name or description..." style="margin: 10px 0; padding: 10px; width: 300px; border: 1px solid #ddd; border-radius: 5px;" onkeyup="searchTable()">
         <option value="">All Categories</option>
         <!-- Options will populate from data -->
     </select>
@@ -99,6 +100,24 @@
         }
 
         function filterTable() {
+    const filterValue = document.getElementById('filter').value.toLowerCase();
+    const rows = document.querySelectorAll('#listings tbody tr');
+    rows.forEach(row => {
+        if (row.style.display !== 'none') {  // Only process if visible after search
+            const cat = row.dataset.category || '';
+            row.style.display = (filterValue === '' || cat === filterValue) ? '' : 'none';
+        }
+    });
+        }
+            function searchTable() {
+    const searchValue = document.getElementById('search').value.toLowerCase();
+    const rows = document.querySelectorAll('#listings tbody tr');
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const cat = row.dataset.category || '';
+        row.style.display = (text.includes(searchValue) || searchValue === '') ? '' : 'none';
+    });
+            }
             const filterValue = document.getElementById('filter').value.toLowerCase();
             const rows = document.querySelectorAll('#listings tbody tr');
             rows.forEach(row => {
